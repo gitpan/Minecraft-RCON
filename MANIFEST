@@ -1,0 +1,8 @@
+scripts/mcrcon.pl
+MANIFEST
+README
+Changes
+lib/Minecraft/RCON.pm
+Makefile.PL
+META.yml
+Bin.PL
