@@ -6,3 +6,4 @@ lib/Minecraft/RCON.pm
 Makefile.PL
 META.yml
 Bin.PL
+Build.PL

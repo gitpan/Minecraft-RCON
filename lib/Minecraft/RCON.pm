@@ -18,7 +18,7 @@ use Data::Dumper;
 use Carp;
 use Term::ANSIColor 3.02;
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 use constant {
     PASSWORD => 3,
