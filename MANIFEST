@@ -1,9 +1,9 @@
-scripts/mcrcon.pl
-MANIFEST
-README
+Bin.PL
+Build.PL
 Changes
 lib/Minecraft/RCON.pm
 Makefile.PL
+MANIFEST
 META.yml
-Bin.PL
-Build.PL
+README
+scripts/mcrcon.pl

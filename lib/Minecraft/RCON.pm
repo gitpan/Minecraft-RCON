@@ -18,7 +18,7 @@ use Data::Dumper;
 use Carp;
 use Term::ANSIColor 3.02;
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 use constant {
     PASSWORD => 3,
@@ -176,18 +176,30 @@ sub _encode_packet {
 }
 sub _decode_packet {
     my ($self,$raw_packet) = @_;
-    my $size = unpack("I",substr $raw_packet,0,4);
-    my $id   = unpack("I",substr $raw_packet,4,4);
-    my $type = unpack("I",substr $raw_packet,8,4);
-    my $payload = substr $raw_packet,12,$size-2;
-    if ($self->strip_color){
-        $payload =~ s/\x{00A7}.//g;
+    if (length($raw_packet) >= 12){ # Check if the packet is viable before trying to decode it.
+        my $size = unpack("I",substr $raw_packet,0,4);
+        my $id   = unpack("I",substr $raw_packet,4,4);
+        my $type = unpack("I",substr $raw_packet,8,4);
+        my $payload = substr $raw_packet,12,$size;
+
+        if ($payload !~ s/\0\0$//){ # A proper Minecraft packet ends in two null characters.
+            carp('Recieved packet might be incomplete');
+        }
+
+        # strip and convert are mutually exclusive, strip takes presidence
+        if ($self->strip_color){
+            $payload =~ s/\x{00A7}.//g;
+        }
+        elsif ($self->convert_color){
+            $payload =~ s/\x{00A7}(.)/$COLOR{$1}/g;
+            $payload .= $COLOR{'r'};
+        }
+        return ($size,$id,$type,$payload);
     }
-    elsif ($self->convert_color){
-        $payload =~ s/\x{00A7}(.)/$COLOR{$1}/g;
-        $payload .= $COLOR{'r'};
+    else {
+        carp('Non-viable packet recieved.  Packet is length '.length($raw_packet));
+        return (undef,undef,undef);
     }
-    return ($size,$id,$type,$payload);
 }
 sub _packet_password {
     my ($self) = @_;
