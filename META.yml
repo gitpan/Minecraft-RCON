@@ -13,9 +13,9 @@ name: Minecraft-RCON
 provides:
   Minecraft::RCON:
     file: lib/Minecraft/RCON.pm
-    version: v0.1.3
+    version: v0.1.4
 requires:
   IO::Socket: 1.18
   Term::ANSIColor: 3.02
   perl: v5.8.8
-version: v0.1.3
+version: v0.1.4

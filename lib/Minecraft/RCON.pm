@@ -18,7 +18,7 @@ use Data::Dumper;
 use Carp;
 use Term::ANSIColor 3.02;
 
-our $VERSION = '0.1.3';
+our $VERSION = '0.1.4';
 
 use constant {
     PASSWORD => 3,
@@ -56,6 +56,7 @@ return 509; # For Kevin
 sub new {
     my ($class,$conf) = @_;
     my $self = $conf;
+    $self->{'request_count'} = 0;
     bless $self,$class;
     return $self;
 }
@@ -154,8 +155,14 @@ sub connect {
 
     print $socket $self->_packet_password;
     my ($size,$id,$type,$payload) = $self->_get_packet($socket);
-    if ($id != 1){
-        carp "RCON password is WRONG";
+    my $expected = $self->_expected_request_id;
+    if ($type != 2){
+        carp "Unknown RCON auth failure, wrong packet type ($type, expected 2) returned.";
+        close($socket);
+        return 0;
+    }
+    elsif (!defined $id || $id != $expected){
+        carp "RCON password is WRONG!";
         close($socket);
         return 0;
     }
@@ -220,6 +227,10 @@ sub _get_packet {
         carp "Attempt at getting a packet from a closed socket";
         return (undef,undef,undef);
     }
+}
+sub _expected_request_id {
+    my ($self) = @_;
+    return $self->{'request_count'};
 }
 
 sub DESTROY {
